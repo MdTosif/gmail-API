@@ -1,20 +1,21 @@
-const qs = require('querystring');
 const { default: fetch } = require('node-fetch');
 
 const { client_id, client_secret, redirect_uri } = require('./credentials');
 
-const stringifiedParams = qs.encode({
-  client_id,
-  redirect_uri,
-  scope: [
-    'https://www.googleapis.com/auth/gmail.send',
-    'https://www.googleapis.com/auth/userinfo.email',
-    'https://www.googleapis.com/auth/userinfo.profile',
-  ].join(' '), // space seperated string
-  response_type: 'code',
-  access_type: 'offline',
-  prompt: 'consent',
-});
+const params = new URLSearchParams();
+
+params.append('client_id', client_id);
+params.append('redirect_uri', redirect_uri);
+params.append('scope', [
+  'https://www.googleapis.com/auth/gmail.send',
+  'https://www.googleapis.com/auth/userinfo.email',
+  'https://www.googleapis.com/auth/userinfo.profile',
+].join(' '));
+params.append('response_type', 'code');
+params.append('access_type', 'offline');
+params.append('prompt', 'consent');
+
+const stringifiedParams = params.toString();
 
 async function getToken(code) {
   const res = await fetch('https://oauth2.googleapis.com/token', {
@@ -50,7 +51,7 @@ function emailData(data) {
 
 async function sendEmail(data) {
   const body = emailData(data);
-  const reqURI = `https://gmail.googleapis.com/gmail/v1/users/${qs.encode(data.email)}/messages/send?access_token=${data.token}`;
+  const reqURI = `https://gmail.googleapis.com/gmail/v1/users/${data.email}/messages/send?access_token=${data.token}`;
   const res = await fetch(reqURI, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
