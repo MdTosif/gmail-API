@@ -33,5 +33,5 @@ app.post('/:email', async (req, res) => {
   if (result.error) throw new Error(result.error);
   res.send(result);
 });
-
-app.listen(3000);
+const port = process.env.PORT || 3000;
+app.listen(port);
