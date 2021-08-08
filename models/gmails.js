@@ -2,7 +2,10 @@ const { default: fetch } = require('node-fetch');
 const mongoose = require('./db');
 
 const GmailModel = mongoose.model('gmail', mongoose.Schema({
-  email: String,
+  email: {
+    type: String,
+    unique: true,
+  },
   token: String,
 }));
 
@@ -14,7 +17,13 @@ async function addGmail(token) {
     },
   });
   const body = await res.json();
-  const result = GmailModel({ ...body, token }).save();
+  const gmail = await GmailModel.findOne({ email: body.email });
+  if (gmail === {}) {
+    const result = GmailModel({ ...body, token }).save();
+    return result;
+  }
+  gmail.token = token;
+  const result = await gmail.save();
   return result;
 }
 
