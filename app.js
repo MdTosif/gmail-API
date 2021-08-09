@@ -8,10 +8,12 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(express.json());
 
+// redirecting to the permission sceen for token
 app.get('/google', (req, res) => {
   res.redirect(oauthURL);
 });
 
+// the route where the oauth will redirect after successfull login
 app.get('/g-auth', async (req, res, next) => {
   try {
     const { code } = req.query;
@@ -24,11 +26,13 @@ app.get('/g-auth', async (req, res, next) => {
   }
 });
 
+// getting all the email which are in db
 app.get('/emails', async (req, res) => {
   const result = await getGmails();
   res.send(result);
 });
 
+// sending the email with gmail rest api
 app.post('/:email', async (req, res, next) => {
   try {
     const { email } = req.params;
@@ -42,6 +46,7 @@ app.post('/:email', async (req, res, next) => {
   }
 });
 
+// catching any error
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   console.log(err);
